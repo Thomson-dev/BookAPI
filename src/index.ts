@@ -1,6 +1,7 @@
 import app from "./server";
+import connectDB from "./utils/db"; // Adjust the path as needed
 
-
+connectDB();
 
 const port = 3000;
 app.listen(port, () => {
