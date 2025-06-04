@@ -1,11 +1,16 @@
 import { User, IUser } from '../Model/user.model';
-import bcryptjs from 'bcryptjs';
+
 import jwt from 'jsonwebtoken';
+
+interface AuthenticatedRequest extends Request {
+  user?: string;
+}
 
 interface UserService {
   createUser(name: string, email: string, password: string): Promise<IUser >;
   getUserByEmail(email: string): Promise<IUser  | null>;
   isTokenValid(token: string): Promise<boolean>;
+  getUserData(userId: string): Promise<IUser | null>;
 }
 
 class UserServiceImpl implements UserService {
@@ -44,6 +49,20 @@ class UserServiceImpl implements UserService {
       return false;
     }
   }
+
+
+  
+   /**
+   * Fetches user data by ID
+   * @param userId The user ID from the request.
+   * @returns The user object or null.
+   */
+  async  getUserData(userId: string): Promise<IUser | null> {
+    return await User.findById(userId);
+  }
+
+
+
 }
 
 export default UserServiceImpl;

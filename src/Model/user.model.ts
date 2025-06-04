@@ -34,12 +34,11 @@ userSchema.pre('save', async function (next) {
  * passwords match, false otherwise.
  */
 userSchema.methods.comparePassword = async function (candidate: string): Promise<boolean> {
-  console.log('Candidate:', candidate);
-  console.log('Stored hash:', this.password);
+
  
 
   const isMatch = await bcrypt.compare(candidate, this.password);
-  console.log("Password comparison result:", isMatch);
+  
   return isMatch;
 
 };

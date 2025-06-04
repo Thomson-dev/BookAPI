@@ -1,10 +1,19 @@
 // src/Controllers/auth.controller.ts
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import UserServiceImpl from '../Services/user.service';
-import bcryptjs from 'bcryptjs';
+
 import jwt from 'jsonwebtoken';
 
 import { NextFunction } from 'express';
+
+export interface AuthenticatedRequest extends Request {
+  user?: string;   // user ID set by auth middleware
+  token?: string;  // token set by auth middleware
+}
+
+
+
+
 
 
 
@@ -12,8 +21,6 @@ import { NextFunction } from 'express';
 
 
 const userService = new UserServiceImpl();
-
-
 
 
 /**
@@ -114,5 +121,30 @@ export const tokenIsValid = async (req: Request, res: Response) => {
 
 
 
+ 
 
+/**
+ * Retrieves user data for the authenticated user.
+ * @param {AuthenticatedRequest} req - The request object containing the authenticated user's ID and token.
+ * @param {Response} res - The response object used to send back the response.
+ * 
+ * @returns {Promise<void>} - Responds with the user data and token if the user exists, 
+ * or an error message if the user is not found or an error occurs.
+ */
 
+ export const  getUserData =async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const user = await userService.getUserData(req.user!);
+
+     if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return; // 👈 return early, not the result of res.json()
+      }
+
+      const userData = user.toObject();
+      res.json({ ...userData, token: req.token });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+}
